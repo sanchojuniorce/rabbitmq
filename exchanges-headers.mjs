@@ -1,5 +1,4 @@
 import amqp from 'amqplib';
-import { randomUUID } from 'crypto'
 
 async function exchangeHeaders() {
   const conn = await amqp.connect({
@@ -7,10 +6,49 @@ async function exchangeHeaders() {
     port: 5672,
     username: 'rabbitmq',
     password: 'curso',
-    vhost: 'fanout-example'
   })
 
   const channel = await conn.createChannel()
+
+  // Criar exchange
+  await channel.assertExchange('notify_headers', 'headers')
+  await channel.assertQueue('email_notification')
+  await channel.assertQueue('sms_notification')
+  await channel.assertQueue('push_notification')
+
+  // Binds
+  await channel.bindQueue('email_notification', 'notify_headers', '', {
+    'notification_type': 'email',
+    //'mode': 'internal'
+  })
+
+  // await channel.bindQueue('email_notification_external', 'notify_headers', '', {
+  //   'notification_type': 'email',
+  //   'mode': 'external'
+  // })
+
+  // await channel.bindQueue('email_notification_logs', 'notify_headers', '', {
+  //   'x-match': 'any',
+  //   'notification_type': 'email',
+  //   'mode': 'internal'
+  // })
+
+  await channel.bindQueue('sms_notification', 'notify_headers', '', {
+    'notification_type': 'sms',
+    //'mode': 'internal'
+  })
+
+  await channel.bindQueue('push_notification', 'notify_headers', '', {
+    'notification_type': 'push',
+    //'mode': 'external'
+  })
+
+  // Publicando mensagem
+  channel.publish('notify_headers', '', Buffer.from('meu header'), {
+    headers: {
+      notification_type: 'push'
+    }
+  })
 
   await channel.close()
   await conn.close()
