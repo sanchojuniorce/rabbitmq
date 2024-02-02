@@ -31,6 +31,9 @@ async function exchangeBinding() {
 
   // Exchange fanout - para mandar mensagem para todas as nossas filhas
   await channel.assertExchange('notify_fanout', 'fanout')
+  await channel.bindQueue('email_notification', 'notify_fanout')
+  await channel.bindQueue('sms_notification', 'notify_fanout')
+  await channel.bindQueue('push_notification', 'notify_fanout')
   await channel.bindExchange('notify_fanout', 'notify_headers','', {
     'notification_type': 'all'
   })
