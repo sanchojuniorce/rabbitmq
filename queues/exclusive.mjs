@@ -1,20 +1,21 @@
-import amqp from 'amqplib';
-import { randomUUID } from 'crypto';
+import amqp from "amqplib";
+import { randomUUID } from "crypto";
 
 async function exclusive() {
   const connection = await amqp.connect({
-    hostname: 'localhost',
+    hostname: "localhost",
     port: 5672,
-    username: 'rabbitmq',
-    password: 'curso'
-  })
+    username: "rabbitmq",
+    password: "curso",
+  });
 
   // Criando canal de comunicação
-  const channel = await connection.createChannel()
+  const channel = await connection.createChannel();
 
-  await channel.assertQueue('exclusive', {
-    exclusive: true
+  await channel.assertQueue("exclusive", {
+    exclusive: true,
   });
+
 
   // Consumindo mensagens da fila
   channel.prefetch(3)
@@ -25,16 +26,14 @@ async function exclusive() {
     }, 1000)
   });
 
-  for(let i=0; i<10; i++){
+  // Adicionando mensagens a fila temporária
+  for (let i = 0; i < 10; i++) {
     channel.publish(
-      '', 
-      'exclusive', 
-      Buffer.from(`Mensagem exclusiva ${randomUUID()}`)
-    )
+      "",
+      "exclusive",
+      Buffer.from(`Mensagem exclusiva - ${randomUUID()}`)
+    );
   }
-
-  await channel.close()
-  await connection.close()
 }
 
 exclusive();
