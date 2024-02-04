@@ -1,6 +1,6 @@
 import amqp from 'amqplib';
 
-async function main() {
+async function maxPriority() {
   const connection = await amqp.connect({
     hostname: 'localhost',
     port: 5672,
@@ -26,4 +26,4 @@ async function main() {
   await connection.close()
 }
 
-main();
+maxPriority();
