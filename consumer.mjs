@@ -14,13 +14,15 @@ async function main() {
     durable: true
   })
 
-  channel.prefetch(5)
+  //channel.prefetch(5)
+  channel.prefetch(200)
 
-  channel.consume('minha_fila', (data) => {
+  //channel.consume('minha_fila', (data) => {
+  channel.consume('max_length', (data) => {
     console.log(data.content.toString())
-    // setTimeout(() => {
-    //   channel.ack(data)
-    // }, 5000)
+    setTimeout(() => {
+      channel.ack(data)
+    }, 5000)
   })
 }
 
